@@ -15,21 +15,21 @@ public class User {
     private String name;
     private String address;
     private String phone;
-    private String gender;
-    private Date dob;
+//    private String gender;
+//    private Date dob;
     private String email;
     private String password;
 
     public User() {
     }
 
-    public User(String name, String address, String phone, String gender, Date dob, String email, String password) {
+    public User(String name, String address, String phone, String email, String password) {
         this.userID = UUID.randomUUID().toString();
         this.name = name;
         this.address = address;
         this.phone = phone;
-        this.gender = gender;
-        this.dob = dob;
+//        this.gender = gender;
+//        this.dob = dob;
         this.email = email;
         this.password = password;
     }
@@ -64,22 +64,6 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public Date getDob() {
-        return dob;
-    }
-
-    public void setDob(Date dob) {
-        this.dob = dob;
     }
 
     public String getEmail() {

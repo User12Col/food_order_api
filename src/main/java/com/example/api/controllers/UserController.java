@@ -27,9 +27,9 @@ public class UserController {
     }
 
     //Login
-    //http://localhost:8082/api/v1/Users/email=loc&password=123
-    @GetMapping("/email={email}&password={password}")
-    ResponseEntity<ResponeObject> loginUser(@PathVariable String email, @PathVariable String password){
+    //http://localhost:8082/api/v1/Users/login?email=loc&password=123
+    @GetMapping("/login")
+    ResponseEntity<ResponeObject> loginUser(@RequestParam String email, @RequestParam String password){
         Optional<User> currUser = userRepository.findByEmailAndPassword(email, password);
         return currUser.isPresent() ?
                 ResponseEntity.status(HttpStatus.OK).body(
@@ -60,11 +60,9 @@ public class UserController {
     ResponseEntity<ResponeObject> updateUser(@PathVariable String id, @RequestBody User newUser){
         User foundUser = userRepository.findById(id).map(user->{
             user.setAddress(newUser.getAddress());
-            user.setDob(newUser.getDob());
             user.setEmail(newUser.getEmail());
             user.setName(newUser.getName());
             user.setPhone(newUser.getPhone());
-            user.setGender(newUser.getGender());
             user.setPassword(newUser.getPassword());
             return userRepository.save(user);
         }).orElseGet(()->{
