@@ -74,30 +74,4 @@ public class UserController {
         );
     }
 
-
-    /*
-    * {
-    *   id:...,
-    *   username:...
-    *   password:...
-    *   ....
-    *   [
-    *       {
-    *           id:...
-    *           content:..
-    *           date:...
-    *           image:...
-    *       },
-    *           *       {
-     *           id:...
-     *           content:..
-     *           date:...
-     *           image:...
-     *       },
-     *
-    *   ]
-    * }
-    *
-    *
-    * */
 }

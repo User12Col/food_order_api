@@ -20,8 +20,8 @@ public class CartController {
 
     //Get cart by userID
     //http://localhost:8082/api/v1/Carts/id
-    @GetMapping("/{userID}")
-    ResponseEntity<ResponeObject> getCartByUserID(@PathVariable String userID){
+    @GetMapping("")
+    ResponseEntity<ResponeObject> getCartByUserID(@RequestParam String userID){
         List<Cart> foundCart = cartRepository.findByUserID(userID);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponeObject("ok", "Query success",foundCart)
@@ -35,7 +35,7 @@ public class CartController {
             Optional<Cart> foundCart = cartRepository.findByFoodID(cart.getFood().getFoodID());
             return foundCart.isPresent()?
                     ResponseEntity.status(HttpStatus.OK).body(
-                            new ResponeObject("update", "Update quantity success", cartRepository.updateQuantity(cart.getFood().getFoodID(), cart.getUser().getUserID()))
+                            new ResponeObject("update", "Update quantity success", cartRepository.updateQuantity(cart.getFood().getFoodID(), cart.getUser().getUserID(), cart.getFood().getUnitPrice()))
                     ):
                     ResponseEntity.status(HttpStatus.OK).body(
                             new ResponeObject("ok", "Add to cart success", cartRepository.save(cart))
@@ -49,11 +49,37 @@ public class CartController {
     }
 
     //Decrease quantity by 1
-    @PutMapping("/decreaseQuantity")
+    @PostMapping("/decreaseQuantity")
     ResponseEntity<ResponeObject> decreaseQuantity(@RequestBody Cart cart){
-        Optional<Cart> foundCart = cartRepository.findByFoodID(cart.getFood().getFoodID());
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponeObject("update", "Decrease quantity success", cartRepository.decreaseQuantity(cart.getFood().getFoodID(), cart.getUser().getUserID()))
+                new ResponeObject("update", "Decrease quantity success", cartRepository.decreaseQuantity(cart.getFood().getFoodID(), cart.getUser().getUserID(), cart.getFood().getUnitPrice()))
         );
+    }
+
+    @GetMapping("/quantity")
+    ResponseEntity<ResponeObject> getQuantity(@RequestParam String foodID, @RequestParam String userID){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("ok", "Get quantity success", cartRepository.getQuantity(foodID, userID))
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Query Fail", e.toString())
+            );
+        }
+    }
+
+    @DeleteMapping("/delete")
+    ResponseEntity<ResponeObject> deleteFoodFromCart(@RequestParam String foodID, @RequestParam String userID){
+        try{
+            cartRepository.deleteFoodFromCart(foodID, userID);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("delete", "Delete food from cart success", "")
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Delete food from cart fail", e.toString())
+            );
+        }
     }
 }

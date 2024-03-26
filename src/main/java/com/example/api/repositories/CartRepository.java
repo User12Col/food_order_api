@@ -18,11 +18,20 @@ public interface CartRepository extends JpaRepository<Cart, String> {
 
     @Modifying
     @Transactional
-    @Query(value = "update CART set quantity = quantity + 1 where foodID = ?1 and userID = ?2", nativeQuery = true)
-    int updateQuantity(String foodID, String userID);
+    @Query(value = "update CART set quantity = quantity + 1, totalPrice = totalPrice + ?3 where foodID = ?1 and userID = ?2", nativeQuery = true)
+    int updateQuantity(String foodID, String userID, double price);
 
     @Modifying
     @Transactional
-    @Query(value = "update CART set quantity = quantity - 1 where foodID = ?1 and userID = ?2", nativeQuery = true)
-    int decreaseQuantity(String foodID, String userID);
+    @Query(value = "update CART set quantity = quantity - 1, totalPrice = totalPrice - ?3 where foodID = ?1 and userID = ?2", nativeQuery = true)
+    int decreaseQuantity(String foodID, String userID, double price);
+
+    @Transactional
+    @Query(value = "select c.quantity from CART c where c.foodID = ?1 and c.userID = ?2", nativeQuery = true)
+    int getQuantity(String foodID, String userID);
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete from CART where foodID = ?1 and userID = ?2", nativeQuery = true)
+    void deleteFoodFromCart(String foodID, String userID);
 }

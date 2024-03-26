@@ -2,6 +2,8 @@ package com.example.api.models;
 
 import jakarta.persistence.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "CART")
 public class Cart {
@@ -22,8 +24,8 @@ public class Cart {
     public Cart() {
     }
 
-    public Cart(String cartID, Food food, User user, int quantity, double totalPrice) {
-        this.cartID = cartID;
+    public Cart(Food food, User user, int quantity, double totalPrice) {
+        this.cartID = UUID.randomUUID().toString();
         this.food = food;
         this.user = user;
         this.quantity = quantity;
