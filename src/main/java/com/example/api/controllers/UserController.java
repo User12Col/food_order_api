@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/Users")
@@ -18,12 +19,18 @@ public class UserController {
     private UserRepository userRepository;
 
     //Get all user
-    //http://localhost:8082/api/v1/Users
+    //http://26.46.221.97:8082/api/v1/Users
     @GetMapping("")
     ResponseEntity<ResponeObject> getAllUsers(){
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponeObject("ok", "Query users success",userRepository.findAll())
-        );
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("ok", "Query users success",userRepository.findAll())
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Query users fail", e.toString())
+            );
+        }
     }
 
     //Login
@@ -35,8 +42,8 @@ public class UserController {
                 ResponseEntity.status(HttpStatus.OK).body(
                         new ResponeObject("ok", "Login success", currUser)
                 ):
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        new ResponeObject("fail", "Login fail", "")
+                ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponeObject("fail", "Login fail", "No data")
                 );
     }
 
@@ -44,34 +51,105 @@ public class UserController {
     //http://localhost:8082/api/v1/Users/signup
     @PostMapping("/signup")
     ResponseEntity<ResponeObject> signUpUser(@RequestBody User user){
-        List<User> userList = userRepository.findByEmail(user.getEmail());
-        if(userList.size() > 0){
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponeObject("fail", "User has same email", "")
+        user.setUserID(UUID.randomUUID().toString());
+        try{
+            List<User> userList = userRepository.findByEmail(user.getEmail());
+            if(userList.size() > 0){
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponeObject("fail", "User has same email", "")
+                );
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("ok", "Add user success", userRepository.save(user))
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Add user fail", e.toString())
             );
         }
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponeObject("ok", "Add user success", userRepository.save(user))
-        );
     }
 
     //Update user information
-    @PutMapping("/{id}")
-    ResponseEntity<ResponeObject> updateUser(@PathVariable String id, @RequestBody User newUser){
-        User foundUser = userRepository.findById(id).map(user->{
-            user.setAddress(newUser.getAddress());
-            user.setEmail(newUser.getEmail());
-            user.setName(newUser.getName());
-            user.setPhone(newUser.getPhone());
-            user.setPassword(newUser.getPassword());
-            return userRepository.save(user);
-        }).orElseGet(()->{
-            newUser.setUserID(id);
-            return userRepository.save(newUser);
-        });
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponeObject("ok", "Update success", foundUser)
-        );
+    @PutMapping("/updateUser")
+    ResponseEntity<ResponeObject> updateUser(@RequestParam String id, @RequestBody User newUser){
+        try{
+            User foundUser = userRepository.findById(id).map(user->{
+                user.setAddress(newUser.getAddress());
+                user.setEmail(newUser.getEmail());
+                user.setName(newUser.getName());
+                user.setPhone(newUser.getPhone());
+                user.setPassword(newUser.getPassword());
+                user.setRole(newUser.getRole());
+                return userRepository.save(user);
+            }).orElseGet(()->{
+                newUser.setUserID(id);
+                return userRepository.save(newUser);
+            });
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("ok", "Update success", foundUser)
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Update fail", e.toString())
+            );
+        }
+    }
+
+    @DeleteMapping("/deleteUser")
+    ResponseEntity<ResponeObject> deleteUser(@RequestParam String id){
+        try{
+            userRepository.deleteById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("ok", "Delete Success", "")
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Delete Fail", e.toString())
+            );
+        }
+    }
+
+    @GetMapping("/getUserByName")
+    ResponseEntity<ResponeObject> getUserByName(@RequestParam String name){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("ok", "Query Success", userRepository.findByName("%" + name + "%"))
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Query Fail", e.toString())
+            );
+        }
+    }
+
+    @GetMapping("/getUserById")
+    ResponseEntity<ResponeObject> getUserById(@RequestParam String userID){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("ok", "Get user success", userRepository.findById(userID))
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Get user fail", e.toString())
+            );
+        }
+    }
+
+    @GetMapping("/loginAdmin")
+    ResponseEntity<ResponeObject> loginAdmin(@RequestParam String email, @RequestParam String password){
+        try{
+            return userRepository.loginAdmin(email, password).isPresent() ?
+                ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponeObject("ok", "Login success", userRepository.loginAdmin(email, password))
+                ) :
+                ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponeObject("fail", "Login fail", userRepository.loginAdmin(email, password))
+                );
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Error", e.toString())
+            );
+        }
     }
 
 }

@@ -1,8 +1,6 @@
 package com.example.api.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.Date;
 import java.util.UUID;
@@ -20,18 +18,29 @@ public class User {
     private String email;
     private String password;
 
+    @ManyToOne
+    @JoinColumn(name = "roleID")
+    private Role role;
+
     public User() {
     }
 
-    public User(String name, String address, String phone, String email, String password) {
-        this.userID = UUID.randomUUID().toString();
+    public User(String userID,String name, String address, String phone, String email, String password, Role role) {
+        this.userID = userID;
         this.name = name;
         this.address = address;
         this.phone = phone;
-//        this.gender = gender;
-//        this.dob = dob;
         this.email = email;
         this.password = password;
+        this.role = role;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public String getUserID() {

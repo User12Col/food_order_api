@@ -2,6 +2,8 @@ package com.example.api.models;
 
 import jakarta.persistence.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "FOOD")
 public class Food {
