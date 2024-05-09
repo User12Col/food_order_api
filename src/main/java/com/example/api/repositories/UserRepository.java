@@ -13,15 +13,27 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, String> {
+
+    @Query(value = "SELECT * FROM USER WHERE email = ?1 and password = ?2 and roleID = 2 and isDelete = 0", nativeQuery = true)
     Optional<User> findByEmailAndPassword(String email, String password);
+
+    @Query(value = "SELECT * FROM USER WHERE email = ?1 and isDelete = 0", nativeQuery = true)
     List<User> findByEmail(String email);
 
     @Modifying
     @Transactional
-    @Query(value = "SELECT * FROM USER WHERE name LIKE %:name%", nativeQuery = true)
+    @Query(value = "SELECT * FROM USER WHERE name LIKE %:name% and isDelete = 0", nativeQuery = true)
     List<User> findByName(@Param("name") String name);
 
-    @Query(value = "SELECT * FROM USER WHERE email = ?1 and password = ?2 and roleID != 2", nativeQuery = true)
+    @Query(value = "SELECT * FROM USER WHERE isDelete = 0", nativeQuery = true)
+    List<User> getAllUser();
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE USER set isDelete = 1 WHERE userID = ?1", nativeQuery = true)
+    int deleteUser(String userID);
+
+    @Query(value = "SELECT * FROM USER WHERE email = ?1 and password = ?2 and roleID != 2 and isDelete = 0", nativeQuery = true)
     Optional<User> loginAdmin(String email, String password);
 
 }

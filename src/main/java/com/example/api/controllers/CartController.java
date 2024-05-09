@@ -82,4 +82,18 @@ public class CartController {
             );
         }
     }
+
+    @DeleteMapping("/deleteUserCart")
+    ResponseEntity<ResponeObject> deleteUserCart(@RequestParam String userID){
+        try{
+            cartRepository.deleteUserCart(userID);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("delete", "Delete cart success", "")
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Delete cart fail", e.toString())
+            );
+        }
+    }
 }

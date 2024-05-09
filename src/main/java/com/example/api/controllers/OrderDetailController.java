@@ -32,7 +32,7 @@ public class OrderDetailController {
 
     @PostMapping("/addOrderDetail")
     ResponseEntity<ResponeObject> addOrderDetail(@RequestBody OrderDetail orderDetail){
-        orderDetail.setOrderDetailID(UUID.randomUUID().toString());
+//        orderDetail.setOrderDetailID(UUID.randomUUID().toString());
         try{
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponeObject("ok", "Add Order Detail Success", orderDetailRepository.save(orderDetail))

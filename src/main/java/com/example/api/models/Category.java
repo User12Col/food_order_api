@@ -11,9 +11,20 @@ public class Category {
     private int cateID;
     private String name;
 
+    private int isDelete;
+
     public Category(int cateID, String name) {
         this.cateID = cateID;
         this.name = name;
+        this.isDelete = 0;
+    }
+
+    public int getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(int isDelete) {
+        this.isDelete = isDelete;
     }
 
     public Category() {

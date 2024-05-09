@@ -14,6 +14,8 @@ public class Food {
     private String description;
     private String image;
 
+    private int isDelete;
+
     @ManyToOne
     @JoinColumn(name = "cateID")
     private Category category;
@@ -28,6 +30,15 @@ public class Food {
         this.description = description;
         this.image = image;
         this.category = category;
+        this.isDelete = 0;
+    }
+
+    public int getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(int isDelete) {
+        this.isDelete = isDelete;
     }
 
     public String getFoodID() {

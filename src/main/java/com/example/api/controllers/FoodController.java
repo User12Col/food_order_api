@@ -19,9 +19,15 @@ public class FoodController {
     //http://localhost:8082/api/v1/Foods
     @GetMapping("")
     ResponseEntity<ResponeObject> getAllFood(){
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponeObject("ok", "Query foods success", foodRepository.findAll())
-        );
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("ok", "Query foods success", foodRepository.getAllFood())
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Query foods fail", e.toString())
+            );
+        }
     }
 
     @GetMapping("/getFoodById")
@@ -38,10 +44,10 @@ public class FoodController {
     }
 
     @PostMapping("/category")
-    ResponseEntity<ResponeObject> getFoodByCategoryID(@RequestBody Category category){
+    ResponseEntity<ResponeObject> getFoodByCategoryID(@RequestParam int cateID){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponeObject("ok", "Get food success", foodRepository.findByCategory(category))
+                    new ResponeObject("ok", "Get food success", foodRepository.findByCategory(cateID))
             );
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
@@ -53,6 +59,7 @@ public class FoodController {
     @PostMapping("/addFood")
     ResponseEntity<ResponeObject> insertFood(@RequestBody Food food){
         food.setFoodID(UUID.randomUUID().toString());
+        food.setIsDelete(0);
         try {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponeObject("ok", "Insert Success", foodRepository.save(food))
@@ -64,12 +71,11 @@ public class FoodController {
         }
     }
 
-    @DeleteMapping("/deleteFood")
+    @PutMapping("/deleteFood")
     ResponseEntity<ResponeObject> deleteFood(@RequestParam String id){
         try{
-            foodRepository.deleteById(id);
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponeObject("ok", "Delete Success", "")
+                    new ResponeObject("ok", "Delete Success", foodRepository.deleteFood(id))
             );
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -87,6 +93,7 @@ public class FoodController {
                 food.setDescription(newFood.getDescription());
                 food.setImage(newFood.getImage());
                 food.setUnitPrice(newFood.getUnitPrice());
+                food.setIsDelete(newFood.getIsDelete());
                 return foodRepository.save(food);
             }).orElseGet(()->{
                 newFood.setFoodID(id);

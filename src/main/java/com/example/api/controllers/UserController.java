@@ -24,7 +24,7 @@ public class UserController {
     ResponseEntity<ResponeObject> getAllUsers(){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponeObject("ok", "Query users success",userRepository.findAll())
+                    new ResponeObject("ok", "Query users success",userRepository.getAllUser())
             );
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -51,6 +51,7 @@ public class UserController {
     //http://localhost:8082/api/v1/Users/signup
     @PostMapping("/signup")
     ResponseEntity<ResponeObject> signUpUser(@RequestBody User user){
+        user.setIsDelete(0);
         user.setUserID(UUID.randomUUID().toString());
         try{
             List<User> userList = userRepository.findByEmail(user.getEmail());
@@ -80,6 +81,7 @@ public class UserController {
                 user.setPhone(newUser.getPhone());
                 user.setPassword(newUser.getPassword());
                 user.setRole(newUser.getRole());
+                user.setIsDelete(newUser.getIsDelete());
                 return userRepository.save(user);
             }).orElseGet(()->{
                 newUser.setUserID(id);
@@ -95,12 +97,11 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/deleteUser")
+    @PutMapping("/deleteUser")
     ResponseEntity<ResponeObject> deleteUser(@RequestParam String id){
         try{
-            userRepository.deleteById(id);
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponeObject("ok", "Delete Success", "")
+                    new ResponeObject("ok", "Delete Success", userRepository.deleteUser(id))
             );
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.OK).body(

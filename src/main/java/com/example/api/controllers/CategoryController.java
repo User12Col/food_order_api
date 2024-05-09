@@ -18,9 +18,16 @@ public class CategoryController {
     //http://localhost:8082/api/v1/Categories
     @GetMapping("")
     ResponseEntity<ResponeObject> getAllCategory(){
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponeObject("ok", "Query success", categoryRepository.findAll())
-        );
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("ok", "Query success", categoryRepository.getCategory())
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponeObject("fail", "Query fail", e.toString())
+            );
+        }
+
     }
 
     @GetMapping("/getCategoryById")
@@ -38,6 +45,7 @@ public class CategoryController {
 
     @PostMapping("/addCategory")
     ResponseEntity<ResponeObject> insertCategory(@RequestBody Category category){
+        category.setIsDelete(0);
         try {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponeObject("ok", "Insert Success", categoryRepository.save(category))
@@ -49,12 +57,11 @@ public class CategoryController {
         }
     }
 
-    @DeleteMapping("/deleteCategory")
+    @PutMapping("/deleteCategory")
     ResponseEntity<ResponeObject> deleteCategory(@RequestParam int id){
         try{
-            categoryRepository.deleteById(id);
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponeObject("ok", "Delete Success", "")
+                    new ResponeObject("ok", "Delete Success", categoryRepository.deleteCategory(id))
             );
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -64,10 +71,11 @@ public class CategoryController {
     }
 
     @PutMapping("/updateCategory")
-    ResponseEntity<ResponeObject> updateUser(@RequestParam int id, @RequestBody Category newCate){
+    ResponseEntity<ResponeObject> updateCategory(@RequestParam int id, @RequestBody Category newCate){
         try {
             Category foundCate = categoryRepository.findById(id).map(category->{
                 category.setName(newCate.getName());
+                category.setIsDelete(newCate.getIsDelete());
                 return categoryRepository.save(category);
             }).orElseGet(()->{
                 newCate.setCateID(id);
